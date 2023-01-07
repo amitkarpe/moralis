@@ -1,2 +1,2 @@
-# moralis-academy
-moralis-academy
+# Moralis Projects
+
