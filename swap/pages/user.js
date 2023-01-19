@@ -2,7 +2,7 @@ import { getSession, signOut } from "next-auth/react";
 import Moralis from "moralis";
 import { useState } from "react";
 import axios from "axios";
-import { useSendTransaction } from "wagmi";
+import { useSendTransaction, useWaitForTransaction } from "wagmi";
 
 let MATIC = '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
 let USDC  = '0x2791bca1f2de4661ed88a30c99a7a9449aa84174'
@@ -48,45 +48,35 @@ function User({ user, balance }) {
   })
  
   async function processBuy(toToken,tokenValue){
-    console.log("value==>",tokenValue);
     // fund.forEach {
     //     console.log(key + ' = ' + tokenAddress);
     //     // console.log(parseFloat(value)/fund.size);
     //     // get1inchSwap(tokenAddress,parseFloat(value)/fund.size);
     //     var receipt = await processBuy(tokenAddress, parseFloat(value) / fund.size);
     //   })
-      
-      let processOne = new Promise((resolve, reject) => {
-        try {
-            const tx = axios.get(`https://api.1inch.io/v4.0/137/swap?fromTokenAddress=${fromToken}&toTokenAddress=${toToken}&amount=${tokenValue}&fromAddress=${user.address}&slippage=5`);    
+            console.log("toToken ==>", toToken, "value==>",tokenValue);
+            const tx = await axios.get(`https://api.1inch.io/v4.0/137/swap?fromTokenAddress=${fromToken}&toTokenAddress=${toToken}&amount=${tokenValue}&fromAddress=${user.address}&slippage=5`);    
             console.log(tx.data)
             setTo(tx.data.tx.to);
             setTxData(tx.data.tx.data);
             setValueExchangedDecimals(Number(`1E${tx.data.toToken.decimals}`));
             setValueExchanged(tx.data.toTokenAmount);
 
-            sendTransaction();
-            console.log(data);
-            if (!isSuccess) {
-              setTimeout(() => resolve(toToken, 2000));
-            }
-            
-          }
-        catch (error) {
-            console.log(error);
-        }
-
-        });
-      let result = await processOne;
-      console.log(result);
       };
 
     
 
   async function invest(){
-    fund.forEach ((tokenAddress, key) => {
+    fund.forEach (async (tokenAddress, key) => {
         console.log(key + ' = ' + tokenAddress);
-        var receipt = processBuy(tokenAddress, parseFloat(value) / fund.size);
+        var receipt = await processBuy(tokenAddress, parseFloat(value) / fund.size);
+           let transaction_result;
+            // let transaction_result = await sendTransaction();
+            transaction_result = await sendTransaction();
+            console.log(data);
+            // const { isLoading, isSuccess } = useWaitForTransaction({
+            //   hash: data?.hash,
+            // })
       })
   }
  
